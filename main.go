@@ -32,12 +32,19 @@ func main() {
 			continue
 		}
 
-		processURL(userAgent, parsedURL)
+		injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}."}
+
+		fmt.Printf("URL: %s\n", parsedURL)
+
+		for _, value := range injectedValues {
+			injectedURL := replaceParamValue(parsedURL, value)
+			processURL(userAgent, injectedURL, value)
+		}
 	}
 }
 
-func processURL(userAgent string, parsedURL *url.URL) {
-	
+func processURL(userAgent string, parsedURL *url.URL, injectedValue string) {
+	// Create an HTTP client with certificate verification disabled
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -64,16 +71,12 @@ func processURL(userAgent string, parsedURL *url.URL) {
 		return
 	}
 
-	injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}."}
+	fmt.Printf("Injected Value: %s\n", injectedValue)
 
 	if strings.Contains(string(body), "4584996") {
-		fmt.Printf("URL: %s\n", parsedURL)
-		fmt.Printf("Parameter: %s\n", parsedURL.RawQuery)
-		fmt.Printf("Injected Values:\n")
-		for _, value := range injectedValues {
-			fmt.Printf("%s: %s\n", value, value)
-		}
-		fmt.Println("4584996 found in the response!\n")
+		fmt.Println("4584996 reflection is found\n")
+	} else {
+		fmt.Println("No 4584996 reflection\n")
 	}
 }
 
@@ -88,4 +91,20 @@ func generateRandomUserAgent() string {
 	randomIndex := rand.Intn(len(userAgents))
 
 	return userAgents[randomIndex]
+}
+
+func replaceParamValue(parsedURL *url.URL, value string) *url.URL {
+	queryValues, err := url.ParseQuery(parsedURL.RawQuery)
+	if err != nil {
+		fmt.Printf("Error parsing query: %v\n", err)
+		return parsedURL
+	}
+
+	for key := range queryValues {
+		queryValues.Set(key, value)
+	}
+
+	parsedURL.RawQuery = queryValues.Encode()
+
+	return parsedURL
 }

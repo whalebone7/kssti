@@ -57,7 +57,7 @@ func processURL(userAgent string, parsedURL *url.URL) {
 		return
 	}
 
-	injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}."}
+	injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}"}
 
     for _, param := range parsedURL.Query() {
         for _, value := range injectedValues {

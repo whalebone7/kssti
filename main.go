@@ -61,7 +61,10 @@ func processURL(userAgent string, parsedURL *url.URL) {
 
 	for _, value := range injectedValues {
 		if strings.Contains(string(body), "49") {
-			fmt.Printf("URL: %s, Value: %s found in the response!\n", parsedURL, value)
+			fmt.Printf("URL: %s\n", parsedURL)
+			fmt.Printf("Parameter: %s\n", parsedURL.RawQuery)
+			fmt.Printf("Injected Value: %s\n", value)
+			fmt.Println("49 found in the response!\n")
 		}
 	}
 }

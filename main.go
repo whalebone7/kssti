@@ -36,38 +36,35 @@ func main() {
 }
 
 func processURL(userAgent string, parsedURL *url.URL) {
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", parsedURL.String(), nil)
-	if err != nil {
-		fmt.Printf("Error creating the request: %v\n", err)
-		return
-	}
-	req.Header.Set("User-Agent", userAgent)
+    client := &http.Client{}
+    req, err := http.NewRequest("GET", parsedURL.String(), nil)
+    if err != nil {
+        fmt.Printf("Error creating the request: %v\n", err)
+        return
+    }
+    req.Header.Set("User-Agent", userAgent)
 
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Printf("Error sending the request: %v\n", err)
-		return
-	}
-	defer resp.Body.Close()
+    resp, err := client.Do(req)
+    if err != nil {
+        fmt.Printf("Error sending the request: %v\n", err)
+        return
+    }
+    defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Printf("Error reading the response: %v\n", err)
-		return
-	}
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        fmt.Printf("Error reading the response: %v\n", err)
+        return
+    }
 
-	injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}."}
+    injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}."}
 
-	for _, value := range injectedValues {
-		if strings.Contains(string(body), "4584996") {
-			fmt.Printf("URL: %s\n", parsedURL)
-			fmt.Printf("Parameter: %s\n", parsedURL.RawQuery)
-			fmt.Printf("Injected Value: %s\n", value)
-			fmt.Println("4584996 found in the response!\n")
-		}
-	}
+    if strings.Contains(string(body), "4584996") {
+        fmt.Printf("URL: %s\n", parsedURL)
+        fmt.Println("4584996 found in the response!\n")
+    }
 }
+
 
 func generateRandomUserAgent() string {
 	userAgents := []string{

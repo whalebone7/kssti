@@ -10,7 +10,6 @@ import (
 	"math/rand"
 	"time"
 	"net/url"
-	"crypto/tls"
 )
 
 func main() {
@@ -32,29 +31,12 @@ func main() {
 			continue
 		}
 
-		injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}."}
-
-		fmt.Printf("URL: %s\n", parsedURL)
-
-		params, _ := url.ParseQuery(parsedURL.RawQuery)
-
-		for paramName := range params {
-			for _, value := range injectedValues {
-				injectedURL := replaceParamValue(parsedURL, paramName, value)
-				processURL(userAgent, injectedURL, paramName, value)
-			}
-		}
+		processURL(userAgent, parsedURL)
 	}
 }
 
-func processURL(userAgent string, parsedURL *url.URL, paramName, injectedValue string) {
-	// Create an HTTP client with certificate verification disabled
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
-
+func processURL(userAgent string, parsedURL *url.URL) {
+	client := &http.Client{}
 	req, err := http.NewRequest("GET", parsedURL.String(), nil)
 	if err != nil {
 		fmt.Printf("Error creating the request: %v\n", err)
@@ -75,14 +57,25 @@ func processURL(userAgent string, parsedURL *url.URL, paramName, injectedValue s
 		return
 	}
 
-	fmt.Printf("Parameter: %s\n", paramName)
-	fmt.Printf("Injected Value: %s\n", injectedValue)
+	injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}."}
 
-	if strings.Contains(string(body), "4584996") {
-		fmt.Println("4584996 reflection is found\n")
-	} else {
-		fmt.Println("No 4584996 reflection\n")
-	}
+    for _, param := range parsedURL.Query() {
+        for _, value := range injectedValues {
+            for _, paramValue := range param {
+                if strings.Contains(string(body), "4584996") {
+                    fmt.Printf("URL: %s\n", parsedURL)
+                    fmt.Printf("Parameter: %s\n", paramValue)
+                    fmt.Printf("Injected Value: %s\n", value)
+                    fmt.Println("4584996 found in the response!\n")
+                } else {
+                    fmt.Printf("URL: %s\n", parsedURL)
+                    fmt.Printf("Parameter: %s\n", paramValue)
+                    fmt.Printf("Injected Value: %s\n", value)
+                    fmt.Println("No 4584996 reflection\n")
+                }
+            }
+        }
+    }
 }
 
 func generateRandomUserAgent() string {
@@ -97,11 +90,3 @@ func generateRandomUserAgent() string {
 
 	return userAgents[randomIndex]
 }
-
-func replaceParamValue(parsedURL *url.URL, paramName, value string) *url.URL {
-	params, _ := url.ParseQuery(parsedURL.RawQuery)
-	params.Set(paramName, value)
-	parsedURL.RawQuery = params.Encode()
-	return parsedURL
-}
-         

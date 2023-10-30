@@ -20,20 +20,17 @@ func main() {
 	for scanner.Scan() {
 		inputURL := scanner.Text()
 
-
 		parsedURL, err := url.Parse(inputURL)
 		if err != nil {
 			fmt.Printf("Error parsing the URL: %v\n", err)
 			continue
 		}
 
-
 		if !parsedURL.IsAbs() {
 			fmt.Printf("Invalid URL: %s is not an absolute URL\n", inputURL)
 			continue
 		}
 
-	
 		processURL(userAgent, parsedURL)
 	}
 }
@@ -74,10 +71,11 @@ func generateRandomUserAgent() string {
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Firefox/52.0",
 		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/602.4.8 (KHTML, like Gecko) Safari/602.4.8",
-		// Add more user agents as needed
+		
 	}
 
 	rand.Seed(time.Now().UnixNano())
 	randomIndex := rand.Intn(len(userAgents))
 
 	return userAgents[randomIndex]
+}

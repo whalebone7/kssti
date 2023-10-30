@@ -36,14 +36,18 @@ func main() {
 
 		fmt.Printf("URL: %s\n", parsedURL)
 
-		for _, value := range injectedValues {
-			injectedURL := replaceParamValue(parsedURL, value)
-			processURL(userAgent, injectedURL, value)
+		params, _ := url.ParseQuery(parsedURL.RawQuery)
+
+		for paramName := range params {
+			for _, value := range injectedValues {
+				injectedURL := replaceParamValue(parsedURL, paramName, value)
+				processURL(userAgent, injectedURL, paramName, value)
+			}
 		}
 	}
 }
 
-func processURL(userAgent string, parsedURL *url.URL, injectedValue string) {
+func processURL(userAgent string, parsedURL *url.URL, paramName, injectedValue string) {
 	// Create an HTTP client with certificate verification disabled
 	client := &http.Client{
 		Transport: &http.Transport{
@@ -71,6 +75,7 @@ func processURL(userAgent string, parsedURL *url.URL, injectedValue string) {
 		return
 	}
 
+	fmt.Printf("Parameter: %s\n", paramName)
 	fmt.Printf("Injected Value: %s\n", injectedValue)
 
 	if strings.Contains(string(body), "4584996") {
@@ -93,18 +98,10 @@ func generateRandomUserAgent() string {
 	return userAgents[randomIndex]
 }
 
-func replaceParamValue(parsedURL *url.URL, value string) *url.URL {
-	queryValues, err := url.ParseQuery(parsedURL.RawQuery)
-	if err != nil {
-		fmt.Printf("Error parsing query: %v\n", err)
-		return parsedURL
-	}
-
-	for key := range queryValues {
-		queryValues.Set(key, value)
-	}
-
-	parsedURL.RawQuery = queryValues.Encode()
-
+func replaceParamValue(parsedURL *url.URL, paramName, value string) *url.URL {
+	params, _ := url.ParseQuery(parsedURL.RawQuery)
+	params.Set(paramName, value)
+	parsedURL.RawQuery = params.Encode()
 	return parsedURL
 }
+         

@@ -57,14 +57,14 @@ func processURL(userAgent string, parsedURL *url.URL) {
 		return
 	}
 
-	injectedValues := []string{"{{7*7}}", "<%= 7*7 %>", "${{7*7}}", "#{7*7}", "*{7*7}", "${7*7}."}
+	injectedValues := []string{"{{7878*582}}", "<%= 7878*582 %>", "${{7878*582}}", "#{7878*582}", "*{7878*582}", "${7878*582}."}
 
 	for _, value := range injectedValues {
-		if strings.Contains(string(body), "49") {
+		if strings.Contains(string(body), "4584996") {
 			fmt.Printf("URL: %s\n", parsedURL)
 			fmt.Printf("Parameter: %s\n", parsedURL.RawQuery)
 			fmt.Printf("Injected Value: %s\n", value)
-			fmt.Println("49 found in the response!\n")
+			fmt.Println("4584996 found in the response!\n")
 		}
 	}
 }
